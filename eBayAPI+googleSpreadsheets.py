@@ -18,17 +18,17 @@ from time import sleep
 stopWords = set(stopwords.words('english'))
 
 
-def setUpLogging(logFile=None, level=logging.INFO, source=__name__):
+def setUpLogging(logFile = None, level = logging.INFO, source = __name__):
 	open(logFile, 'w').close()
 	
 	logger = logging.getLogger(source)
 	logger.setLevel(level)
 	
 	handler = logging.handlers.RotatingFileHandler(
-			filename=logFile,
-			maxBytes=10485760,
-			backupCount=10,
-			encoding='utf8')
+			filename = logFile,
+			maxBytes = 10485760,
+			backupCount = 10,
+			encoding = 'utf8')
 	
 	logger.addHandler(handler)
 	
@@ -69,17 +69,17 @@ if __name__ == '__main__':
 		data = {}
 		
 		try:
-			api = Trading(debug=False, config_file=None,
-			              appid='appid',  # replace
-			              certid='certid',  # replace
-			              devid='devid',  # replace
-			              token='token'  # replace
+			api = Trading(debug = False, config_file = None,
+			              appid = 'appid',  # replace
+			              certid = 'certid',  # replace
+			              devid = 'devid',  # replace
+			              token = 'token'  # replace
 			              )
 			
 			activeList = api.execute('GetMyeBaySelling', {
 					'ActiveList' : True,
 					'DetailLevel': 'ReturnAll'
-			})
+					})
 			
 			if activeList.reply.Ack == 'Success':
 				
@@ -101,17 +101,17 @@ if __name__ == '__main__':
 					data = tryToAdd(data, 'startTIme', str(item.ListingDetails.get('StartTime')))
 					data = tryToAdd(data, 'id', str(item.ItemID))
 			
-			api = Trading(debug=False, config_file=None,
-			              appid='appid',  # replace
-			              certid='certid',  # replace
-			              devid='devid',  # replace
-			              token='token'  # replace
+			api = Trading(debug = False, config_file = None,
+			              appid = 'appid',  # replace
+			              certid = 'certid',  # replace
+			              devid = 'devid',  # replace
+			              token = 'token'  # replace
 			              )
 			
 			activeList = api.execute('GetMyeBaySelling', {
 					'ActiveList' : True,
 					'DetailLevel': 'ReturnAll'
-			})
+					})
 			
 			if activeList.reply.Ack == 'Success':
 				
@@ -167,12 +167,12 @@ if __name__ == '__main__':
 			storedData = pd.DataFrame(sheet.get_all_records())
 			
 			storedData = storedData.loc[storedData['id'].isin(data['id'])]
-			storedData.reset_index(drop=True, inplace=True)
+			storedData.reset_index(drop = True, inplace = True)
 			
 			storedData['id'] = [str(value) for value in storedData['id']]
 		
 		except:
-			storedData = pd.DataFrame(columns=columnsOrder)
+			storedData = pd.DataFrame(columns = columnsOrder)
 		
 		for index, row in data.iterrows():
 			
@@ -180,7 +180,7 @@ if __name__ == '__main__':
 				storedData.loc[len(storedData.index)] = row
 		
 		storedData = storedData.sort_values(['startTime', 'shop', 'id'],
-		                                    ascending=[False, True, False])
+		                                    ascending = [False, True, False])
 		
 		storedData['buyPrice'] = [int(float(value)) if str(value) != '' else ''
 		                          for value in storedData['buyPrice']]
@@ -195,7 +195,7 @@ if __name__ == '__main__':
 		storedData = storedData[columnsOrder]
 		
 		try:
-			gd.set_with_dataframe(sheet, storedData, include_column_header=True, resize=True)
+			gd.set_with_dataframe(sheet, storedData, include_column_header = True, resize = True)
 		
 		except:
 			

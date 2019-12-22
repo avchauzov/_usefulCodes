@@ -74,7 +74,7 @@ class distance:
 				'filter token._from == "' + str(id1) + '" ' + \
 				'filter token._to == "' + str(id2) + '" ' + \
 				'return [token.similarity, token.type]'
-		)
+				)
 		
 		return [value for value in cursorType]
 

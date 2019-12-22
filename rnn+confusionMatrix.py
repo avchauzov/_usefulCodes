@@ -19,11 +19,11 @@ from sklearn.utils import class_weight
 #
 
 def plotConfusionMatrix(cm, classes,
-                        normalize=False,
-                        title='Confusion matrix',
-                        cmap='coolwarm'):
+                        normalize = False,
+                        title = 'Confusion matrix',
+                        cmap = 'coolwarm'):
 	if normalize:
-		cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+		cm = cm.astype('float') / cm.sum(axis = 1)[:, np.newaxis]
 		print('Normalized confusion matrix')
 	
 	else:
@@ -31,19 +31,19 @@ def plotConfusionMatrix(cm, classes,
 	
 	print(cm)
 	
-	plt.imshow(cm, interpolation='nearest', cmap=cmap)
+	plt.imshow(cm, interpolation = 'nearest', cmap = cmap)
 	plt.title(title)
 	# plt.colorbar()
 	tick_marks = np.arange(len(classes))
-	plt.xticks(tick_marks, classes, rotation=45)
+	plt.xticks(tick_marks, classes, rotation = 45)
 	plt.yticks(tick_marks, classes)
 	
 	fmt = '.2f' if normalize else 'd'
 	thresh = cm.max() / 2.
 	for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
 		plt.text(j, i, format(cm[i, j], fmt),
-		         horizontalalignment='center',
-		         color='white' if cm[i, j] > thresh else 'black')
+		         horizontalalignment = 'center',
+		         color = 'white' if cm[i, j] > thresh else 'black')
 	
 	plt.ylabel('True label')
 	plt.xlabel('Predicted label')
@@ -104,22 +104,22 @@ weights = class_weight.compute_class_weight('balanced',
 
 
 def createModel(numOfCells):
-	input1 = Input(shape=(len(xDataPRS[0]), 1))
-	mask1 = Masking(mask_value=-1.0, input_shape=(len(xDataPRS[0]), 1))(input1)
+	input1 = Input(shape = (len(xDataPRS[0]), 1))
+	mask1 = Masking(mask_value = -1.0, input_shape = (len(xDataPRS[0]), 1))(input1)
 	lstmLayer1 = LSTM(numOfCells)(mask1)
 	bn1 = BatchNormalization()(lstmLayer1)
 	
-	input2 = Input(shape=(len(xDataTeam[0]), 1))
-	mask2 = Masking(mask_value=-1.0, input_shape=(len(xDataTeam[0]), 1))(input2)
+	input2 = Input(shape = (len(xDataTeam[0]), 1))
+	mask2 = Masking(mask_value = -1.0, input_shape = (len(xDataTeam[0]), 1))(input2)
 	lstmLayer2 = LSTM(numOfCells)(mask2)
 	bn2 = BatchNormalization()(lstmLayer2)
 	
-	mergeLayer = concatenate([bn1, bn2], axis=1)
+	mergeLayer = concatenate([bn1, bn2], axis = 1)
 	
-	output = Dense(len(yDataCategorical[0]), activation='softmax')(mergeLayer)
+	output = Dense(len(yDataCategorical[0]), activation = 'softmax')(mergeLayer)
 	
-	model = Model(inputs=[input1, input2], outputs=output)
-	model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['categorical_accuracy'])
+	model = Model(inputs = [input1, input2], outputs = output)
+	model.compile(loss = 'categorical_crossentropy', optimizer = 'adam', metrics = ['categorical_accuracy'])
 	model.summary()
 	
 	return model
@@ -132,10 +132,10 @@ def createModel(numOfCells):
 history = model.fit(xTest, yTest,
                     epochs=1000, batch_size=8, class_weight=weights)'''
 
-earlyStopping = EarlyStopping(monitor='val_loss',
-                              min_delta=0,
-                              patience=10,
-                              verbose=0, mode='auto')
+earlyStopping = EarlyStopping(monitor = 'val_loss',
+                              min_delta = 0,
+                              patience = 10,
+                              verbose = 0, mode = 'auto')
 
 from sklearn.model_selection import StratifiedKFold
 
@@ -143,7 +143,7 @@ outputReal = []
 outputPredicted = []
 outputProbability = []
 testIndices = []
-skf = StratifiedKFold(n_splits=40, shuffle=True)
+skf = StratifiedKFold(n_splits = 40, shuffle = True)
 for trainIndex, testIndex in skf.split(xDataPRS, yData):
 	xTrainPRS, xTestPRS = xDataPRS[trainIndex], xDataPRS[testIndex]
 	xTrainTeam, xTestTeam = xDataTeam[trainIndex], xDataTeam[testIndex]
@@ -152,7 +152,7 @@ for trainIndex, testIndex in skf.split(xDataPRS, yData):
 	model = createModel(2)
 	
 	history = model.fit([xTrainPRS, xTrainTeam], yTrain,
-	                    epochs=300, batch_size=1024, class_weight=weights)
+	                    epochs = 300, batch_size = 1024, class_weight = weights)
 	
 	print(history.history.keys())
 	
@@ -180,18 +180,18 @@ for trainIndex, testIndex in skf.split(xDataPRS, yData):
 	
 	cm = confusion_matrix(outputReal, outputPredicted)
 	
-	np.set_printoptions(precision=2)
+	np.set_printoptions(precision = 2)
 	
-	figure = plt.figure(figsize=(10, 5))
+	figure = plt.figure(figsize = (10, 5))
 	
 	plt.subplot(1, 1, 1)
-	plotConfusionMatrix(cm, classes=['class_0', 'class_1'],
-	                    title='startPrediction')
+	plotConfusionMatrix(cm, classes = ['class_0', 'class_1'],
+	                    title = 'startPrediction')
 	
 	# plt.show()
 	plt.clf()
 
-metaData = pd.read_csv('data/metaData.csv', index_col=0)
+metaData = pd.read_csv('data/metaData.csv', index_col = 0)
 
 dataPredictions = pd.DataFrame()
 dataPredictions['testIndex'] = testIndices
@@ -199,8 +199,8 @@ dataPredictions['realValue'] = outputReal
 dataPredictions['predictedValue'] = outputPredicted
 dataPredictions['predictedProbability'] = outputProbability
 
-dataPredictions.sort_values('testIndex', inplace=True)
-dataPredictions = pd.merge(dataPredictions, metaData, left_on='testIndex', right_index=True)
+dataPredictions.sort_values('testIndex', inplace = True)
+dataPredictions = pd.merge(dataPredictions, metaData, left_on = 'testIndex', right_index = True)
 dataPredictions['split'] = [int(str(value).split('[')[1].replace(']', '')) for value in dataPredictions['name']]
 
 for index in range(1, 7):
@@ -214,13 +214,13 @@ for index in range(1, 7):
 	cm = confusion_matrix(tempDataPredictions['realValue'].values,
 	                      tempDataPredictions['predictedValue'].values)
 	
-	np.set_printoptions(precision=2)
+	np.set_printoptions(precision = 2)
 	
-	figure = plt.figure(figsize=(10, 5))
+	figure = plt.figure(figsize = (10, 5))
 	
 	plt.subplot(1, 1, 1)
-	plotConfusionMatrix(cm, classes=['bad', 'good'],
-	                    title='split[' + str(index) + '][' + str(tempMetricAccuracy) + '][' + str(tempMetricLogLoss) + ']')
+	plotConfusionMatrix(cm, classes = ['bad', 'good'],
+	                    title = 'split[' + str(index) + '][' + str(tempMetricAccuracy) + '][' + str(tempMetricLogLoss) + ']')
 	
 	plt.savefig('split[' + str(index) + '].png')
 	

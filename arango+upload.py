@@ -17,7 +17,7 @@ class uploadData:
 	
 	def __init__(self):
 		self.db = self.getArangoConnection()
-		self.data = pd.read_csv(INPUT_DATA, index_col=0)
+		self.data = pd.read_csv(INPUT_DATA, index_col = 0)
 		
 		self.dictionaryToken = {}
 	
@@ -53,19 +53,19 @@ class uploadData:
 						'_to'       : TOKEN_COLLECTION + '/' + str(self.dictionaryToken.get(toIndex)),
 						'similarity': round(similarity, 3),
 						'type'      : type
-				})
+						})
 			
 			except Exception:
 				return 'unsuccessful token2token.insert at ' + str(index)
 		
 		traversal_results = graph.traverse(
-				start_vertex=TOKEN_COLLECTION + '/' + str(self.dictionaryToken.get(fromIndex)),
-				max_depth=2,
-				direction='any',
+				start_vertex = TOKEN_COLLECTION + '/' + str(self.dictionaryToken.get(fromIndex)),
+				max_depth = 2,
+				direction = 'any',
 				# strategy='bfs',
-				edge_uniqueness='global',
-				vertex_uniqueness='global',
-		)
+				edge_uniqueness = 'global',
+				vertex_uniqueness = 'global',
+				)
 		
 		return 'finished'
 	
@@ -90,16 +90,16 @@ class uploadData:
 				self.token = self.graph.create_vertex_collection(TOKEN_COLLECTION)
 				
 				self.token2token = self.graph.create_edge_definition(
-						name=TOKEN2TOKEN_COLLECTION,
-						from_collections=[TOKEN_COLLECTION],
-						to_collections=[TOKEN_COLLECTION]
-				)
+						name = TOKEN2TOKEN_COLLECTION,
+						from_collections = [TOKEN_COLLECTION],
+						to_collections = [TOKEN_COLLECTION]
+						)
 			
 			except:
 				self.graph = self.db.graph(GRAPH_NAME)
 				
 				try:
-					self.graph.delete_vertex_collection(TOKEN_COLLECTION, purge=True)
+					self.graph.delete_vertex_collection(TOKEN_COLLECTION, purge = True)
 				
 				except:
 					pass
@@ -112,7 +112,7 @@ class uploadData:
 					pass
 				
 				try:
-					self.graph.delete_edge_definition(TOKEN2TOKEN_COLLECTION, purge=True)
+					self.graph.delete_edge_definition(TOKEN2TOKEN_COLLECTION, purge = True)
 				
 				except:
 					pass
@@ -125,10 +125,10 @@ class uploadData:
 				self.token = self.graph.create_vertex_collection(TOKEN_COLLECTION)
 				
 				self.token2token = self.graph.create_edge_definition(
-						name=TOKEN2TOKEN_COLLECTION,
-						from_collections=[TOKEN_COLLECTION],
-						to_collections=[TOKEN_COLLECTION]
-				)
+						name = TOKEN2TOKEN_COLLECTION,
+						from_collections = [TOKEN_COLLECTION],
+						to_collections = [TOKEN_COLLECTION]
+						)
 		
 		self.listOfTokens = list(self.data['originalToken']) + list(self.data['connectedToken'])
 		

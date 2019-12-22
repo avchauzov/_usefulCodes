@@ -26,12 +26,12 @@ def warn(*args, **kwargs):
 warnings.filterwarnings('ignore')
 warnings.warn = warn
 
-warnings.simplefilter(action='ignore', category=FutureWarning)
-warnings.simplefilter(action='ignore', category=DeprecationWarning)
+warnings.simplefilter(action = 'ignore', category = FutureWarning)
+warnings.simplefilter(action = 'ignore', category = DeprecationWarning)
 
 with warnings.catch_warnings():
-	warnings.filterwarnings('ignore', category=FutureWarning)
-	warnings.filterwarnings('ignore', category=DeprecationWarning)
+	warnings.filterwarnings('ignore', category = FutureWarning)
+	warnings.filterwarnings('ignore', category = DeprecationWarning)
 
 
 def spearman(array1, array2):
@@ -80,8 +80,8 @@ def loadData(df, aggregation):
 	mainDataConverted = pd.DataFrame()
 	scalingTS = {}
 	
-	df = df.sort_values(['to_member_id', 'cycle'], ascending=[True, True])
-	df.drop_duplicates(inplace=True)
+	df = df.sort_values(['to_member_id', 'cycle'], ascending = [True, True])
+	df.drop_duplicates(inplace = True)
 	
 	for id, filter in enumerate(sorted(list(set(df['to_member_id'])))):
 		
@@ -101,22 +101,22 @@ def loadData(df, aggregation):
 				else:
 					scalingTS[cycle].append(aggregate)
 			
-			data = data.loc[data['cycle'] >= minDate + relativedelta(months=3)]
+			data = data.loc[data['cycle'] >= minDate + relativedelta(months = 3)]
 			
 			data = data.groupby('cycle').agg({'aggregate': np.mean}).reset_index()
 			
 			data = pd.DataFrame(data.set_index('cycle')['aggregate'])
 			data.columns = ['aggregate']
 			
-			data = data.reindex(pd.date_range(start=data.index.min(),
-			                                  end=data.index.max(),
-			                                  freq='d')).interpolate(method='linear')
+			data = data.reindex(pd.date_range(start = data.index.min(),
+			                                  end = data.index.max(),
+			                                  freq = 'd')).interpolate(method = 'linear')
 			
 			data = traces.TimeSeries(data['aggregate'])
-			data = data.moving_average(60 * 60 * 24 * aggregation * 3 * (365 / 12), pandas=True)
+			data = data.moving_average(60 * 60 * 24 * aggregation * 3 * (365 / 12), pandas = True)
 			data = pd.DataFrame(data)
 			
-			data.reset_index(inplace=True)
+			data.reset_index(inplace = True)
 			data.columns = ['cycle', 'aggregate']
 			
 			data['to_member_id'] = [filter] * len(data.index)
@@ -143,21 +143,21 @@ def loadData(df, aggregation):
 		for key, value in scalingTS.items():
 			scalingTS[key] = [min(-25, np.percentile(value, 10)), max(np.percentile(value, 90), 25)]
 		
-		scalingTS = pd.DataFrame.from_dict(scalingTS, orient='index')
-		scalingTS = scalingTS.reindex(pd.date_range(start=min(scalingTS.index) - relativedelta(months=3),
-		                                            end=max(scalingTS.index) + relativedelta(months=3),
-		                                            freq='d')).interpolate(method='linear')
+		scalingTS = pd.DataFrame.from_dict(scalingTS, orient = 'index')
+		scalingTS = scalingTS.reindex(pd.date_range(start = min(scalingTS.index) - relativedelta(months = 3),
+		                                            end = max(scalingTS.index) + relativedelta(months = 3),
+		                                            freq = 'd')).interpolate(method = 'linear')
 		
 		scalingTS.columns = ['minScore', 'maxScore']
-		scalingTS = scalingTS.rolling(window=90).mean()
+		scalingTS = scalingTS.rolling(window = 90).mean()
 		
-		scalingTS['minScore'].fillna(-25, inplace=True)
-		scalingTS['maxScore'].fillna(25, inplace=True)
+		scalingTS['minScore'].fillna(-25, inplace = True)
+		scalingTS['maxScore'].fillna(25, inplace = True)
 		
 		scalingTS.to_csv('data/scalingTS.csv')
 	
 	else:
-		scalingTS = pd.read_csv('data/scalingTS.csv', index_col=0)
+		scalingTS = pd.read_csv('data/scalingTS.csv', index_col = 0)
 	
 	return mainDataConverted, scalingTS
 
@@ -167,7 +167,7 @@ def scalingData(df, dfScaled):
 	df['cycle'] = df['cycle'].dt.normalize()
 	
 	dfScaled.index = pd.to_datetime(dfScaled.index)
-	df = pd.merge(df, dfScaled, how='left', left_on='cycle', right_index=True)
+	df = pd.merge(df, dfScaled, how = 'left', left_on = 'cycle', right_index = True)
 	
 	scaledMin = -1
 	scaledMax = 1
@@ -257,8 +257,8 @@ def dmCalculation(df, aggregation):
 			'''distanceMatrixSpearmanOriginal[id1][id2] = spearman(aggregate1, aggregate2)
 			distanceMatrixSpearmanOriginal[id2][id1] = distanceMatrixSpearmanOriginal[id1][id2]'''
 			
-			function1 = interp1d(cycles1, data1['aggregateScaled'].values, kind='linear')
-			function2 = interp1d(cycles2, data2['aggregateScaled'].values, kind='linear')
+			function1 = interp1d(cycles1, data1['aggregateScaled'].values, kind = 'linear')
+			function2 = interp1d(cycles2, data2['aggregateScaled'].values, kind = 'linear')
 			
 			aggregateScaled1 = function1(xNew)
 			aggregateScaled2 = function2(xNew)
@@ -284,31 +284,31 @@ def dmCalculation(df, aggregation):
 			if filter2 not in scaledValues.keys():
 				scaledValues[filter2] = aggregateScaled2
 	
-	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixSpearmanOriginal.csv', 'w', newline='') as file:
+	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixSpearmanOriginal.csv', 'w', newline = '') as file:
 		writer = csv.writer(file)
 		writer.writerows(distanceMatrixSpearmanOriginal)
 	
-	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixSpearmanScaled.csv', 'w', newline='') as file:
+	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixSpearmanScaled.csv', 'w', newline = '') as file:
 		writer = csv.writer(file)
 		writer.writerows(distanceMatrixSpearmanScaled)
 	
-	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixCIDScaled.csv', 'w', newline='') as file:
+	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixCIDScaled.csv', 'w', newline = '') as file:
 		writer = csv.writer(file)
 		writer.writerows(distanceMatrixCIDScaled)
 	
-	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixFreshetScaled.csv', 'w', newline='') as file:
+	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixFreshetScaled.csv', 'w', newline = '') as file:
 		writer = csv.writer(file)
 		writer.writerows(distanceMatrixFreshetScaled)
 	
-	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixEuclideanScaled.csv', 'w', newline='') as file:
+	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixEuclideanScaled.csv', 'w', newline = '') as file:
 		writer = csv.writer(file)
 		writer.writerows(distanceMatrixEuclideanScaled)
 	
-	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixMJCScaled.csv', 'w', newline='') as file:
+	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixMJCScaled.csv', 'w', newline = '') as file:
 		writer = csv.writer(file)
 		writer.writerows(distanceMatrixMJCScaled)
 	
-	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixLengths.csv', 'w', newline='') as file:
+	with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixLengths.csv', 'w', newline = '') as file:
 		writer = csv.writer(file)
 		writer.writerows(distanceMatrixLengths)
 	
@@ -331,11 +331,11 @@ def dmCalculation(df, aggregation):
 
 def statDataCalculation(df, column, aggregation):
 	extractedFeatures = extract_features(df,
-	                                     column_id='to_member_id',
-	                                     column_value=column,
-	                                     show_warnings=False)
-	extractedFeatures.replace([-np.inf, np.inf], np.nan, inplace=True)
-	extractedFeatures.dropna(axis=1, inplace=True)
+	                                     column_id = 'to_member_id',
+	                                     column_value = column,
+	                                     show_warnings = False)
+	extractedFeatures.replace([-np.inf, np.inf], np.nan, inplace = True)
+	extractedFeatures.dropna(axis = 1, inplace = True)
 	extractedFeatures = impute(extractedFeatures)
 	
 	extractedFeatures.to_csv('data/aggregation[' + str(aggregation) + ']/extractedFeatures[' + str(column) + '].csv')
@@ -429,9 +429,9 @@ def runTestClustering(distanceMatrixSpearmanOriginal, distanceMatrixSpearmanScal
 			for linkage in linkageArray:
 				
 				for nClusters in range(11, maxNumOfClusters, searchStep):
-					clusterer = AgglomerativeClustering(n_clusters=nClusters,
-					                                    affinity='precomputed',
-					                                    linkage=linkage).fit(dmScaled)
+					clusterer = AgglomerativeClustering(n_clusters = nClusters,
+					                                    affinity = 'precomputed',
+					                                    linkage = linkage).fit(dmScaled)
 					clusters = clusterer.labels_
 					
 					clusterDataFrame = pd.DataFrame()
@@ -455,7 +455,7 @@ def runTestClustering(distanceMatrixSpearmanOriginal, distanceMatrixSpearmanScal
 							
 							break
 						
-						smoothSetMean = np.mean(clusterDataFrameFilter['ts'].values, axis=0)
+						smoothSetMean = np.mean(clusterDataFrameFilter['ts'].values, axis = 0)
 						
 						tempArray = []
 						for item in clusterDataFrameFilter['ts'].values:
@@ -475,7 +475,7 @@ def runTestClustering(distanceMatrixSpearmanOriginal, distanceMatrixSpearmanScal
 							
 							break
 						
-						smoothSetMean = np.mean(clusterDataFrameFilter['ts'].values, axis=0)
+						smoothSetMean = np.mean(clusterDataFrameFilter['ts'].values, axis = 0)
 						
 						tempArray = []
 						for item in clusterDataFrameFilter['ts'].values:
@@ -495,7 +495,7 @@ def runTestClustering(distanceMatrixSpearmanOriginal, distanceMatrixSpearmanScal
 							
 							break
 						
-						smoothSetMean = np.mean(clusterDataFrameFilter['ts'].values, axis=0)
+						smoothSetMean = np.mean(clusterDataFrameFilter['ts'].values, axis = 0)
 						
 						tempArray = []
 						for item in clusterDataFrameFilter['ts'].values:
@@ -515,7 +515,7 @@ def runTestClustering(distanceMatrixSpearmanOriginal, distanceMatrixSpearmanScal
 							
 							break
 						
-						smoothSetMean = np.mean(clusterDataFrameFilter['ts'].values, axis=0)
+						smoothSetMean = np.mean(clusterDataFrameFilter['ts'].values, axis = 0)
 						
 						tempArray = []
 						for item in clusterDataFrameFilter['ts'].values:
@@ -535,7 +535,7 @@ def runTestClustering(distanceMatrixSpearmanOriginal, distanceMatrixSpearmanScal
 							
 							break
 						
-						smoothSetMean = np.mean(clusterDataFrameFilter['ts'].values, axis=0)
+						smoothSetMean = np.mean(clusterDataFrameFilter['ts'].values, axis = 0)
 						
 						tempArray = []
 						for item in clusterDataFrameFilter['ts'].values:
@@ -549,7 +549,7 @@ def runTestClustering(distanceMatrixSpearmanOriginal, distanceMatrixSpearmanScal
 					for cluster in sorted(list(set(clusterDataFrame['cluster']))):
 						clusterDataFrameFilter = clusterDataFrame.loc[clusterDataFrame['cluster'] == cluster]
 						
-						smoothSetMean = np.mean(clusterDataFrameFilter['ts'].values, axis=0)
+						smoothSetMean = np.mean(clusterDataFrameFilter['ts'].values, axis = 0)
 						smoothSetArrays.append(smoothSetMean)
 					
 					absMetricNegative = []
@@ -652,29 +652,29 @@ def runTestClustering(distanceMatrixSpearmanOriginal, distanceMatrixSpearmanScal
 							np.median(absMaxMetricNegative),
 							np.median(euclideanMaxMetricNegative),
 							np.median(spearmanMetricNegative),
-					])
+							])
 					
 					print(tempCount, totalCount)
 					tempCount += 1
 	
-	results = pd.DataFrame(results, columns=['spearmanOriginalWeight', 'spearmanScaledWeight', 'cidScaledWeight',
-	                                         'freshetScaledWeight', 'euclideanScaledWeight', 'mjcScaledWeight',
-	                                         'lengthsWeight', 'originalFloatWeight', 'originalBooleanWeight',
-	                                         'scaledFloatWeight', 'scaledBooleanWeight',
-	                                         'scaling', 'linkage',
-	                                         'nClusters',
-	                                         'np.median(absMetric)',
-	                                         'np.median(euclideanMetric)',
-	                                         'np.median(absMaxMetric)',
-	                                         'np.median(euclideanMaxMetric)',
-	                                         'np.median(spearmanMetric)',
+	results = pd.DataFrame(results, columns = ['spearmanOriginalWeight', 'spearmanScaledWeight', 'cidScaledWeight',
+	                                           'freshetScaledWeight', 'euclideanScaledWeight', 'mjcScaledWeight',
+	                                           'lengthsWeight', 'originalFloatWeight', 'originalBooleanWeight',
+	                                           'scaledFloatWeight', 'scaledBooleanWeight',
+	                                           'scaling', 'linkage',
+	                                           'nClusters',
+	                                           'np.median(absMetric)',
+	                                           'np.median(euclideanMetric)',
+	                                           'np.median(absMaxMetric)',
+	                                           'np.median(euclideanMaxMetric)',
+	                                           'np.median(spearmanMetric)',
 	
-	                                         'np.median(absMetricNegative)',
-	                                         'np.median(euclideanMetricNegative)',
-	                                         'np.median(absMaxMetricNegative)',
-	                                         'np.median(euclideanMaxMetricNegative)',
-	                                         'np.median(spearmanMetricNegative)',
-	                                         ])
+	                                           'np.median(absMetricNegative)',
+	                                           'np.median(euclideanMetricNegative)',
+	                                           'np.median(absMaxMetricNegative)',
+	                                           'np.median(euclideanMaxMetricNegative)',
+	                                           'np.median(spearmanMetricNegative)',
+	                                           ])
 	
 	results.to_csv('data/aggregation[' + str(aggregation) + ']/results.csv')
 	
@@ -687,15 +687,15 @@ statDataOption = True
 runTestOption = True
 
 if __name__ == '__main__':
-	mainData = pd.read_csv('../../cuberoot/Peer Rank Deltas - 2019_02_13.csv', index_col=0)
+	mainData = pd.read_csv('../../cuberoot/Peer Rank Deltas - 2019_02_13.csv', index_col = 0)
 	
 	# mainData = mainData.loc[mainData['to_member_id'].isin(sorted(list(set(mainData['to_member_id'])))[: 100])]
 	
-	firedData = pd.read_csv('../../../data/firedData.csv', index_col=None, sep=';')
+	firedData = pd.read_csv('../../../data/firedData.csv', index_col = None, sep = ';')
 	firedData = firedData[~firedData['endDate'].isnull()]
 	firedData = firedData['email'].values
 	
-	salesData = pd.read_csv('../../../data/salesData.csv', index_col=None)
+	salesData = pd.read_csv('../../../data/salesData.csv', index_col = None)
 	salesData = salesData['email'].values
 	
 	mainData = mainData.loc[~mainData['to_member_id'].isin(salesData)]
@@ -722,8 +722,8 @@ if __name__ == '__main__':
 		
 		else:
 			mainDataConverted = pd.read_csv('data/aggregation[' + str(aggregation) + ']/mainDataConverted.csv',
-			                                index_col=0)
-			scalingTS = pd.read_csv('data/scalingTS.csv', index_col=0)
+			                                index_col = 0)
+			scalingTS = pd.read_csv('data/scalingTS.csv', index_col = 0)
 		
 		mainDataConverted = scalingData(mainDataConverted, scalingTS)
 		
@@ -784,7 +784,7 @@ if __name__ == '__main__':
 			distanceMatrixLengths = [[float(float(subValue)) for subValue in value] for value in distanceMatrixLengths]
 			distanceMatrixLengths = np.array(distanceMatrixLengths)
 			
-			scaledValues = pd.read_csv('data/scaledValues.csv', index_col=0)
+			scaledValues = pd.read_csv('data/scaledValues.csv', index_col = 0)
 		
 		import sys
 		
@@ -796,9 +796,9 @@ if __name__ == '__main__':
 		
 		else:
 			extractedFeaturesOriginal = pd.read_csv(
-					'data/aggregation[' + str(aggregation) + ']/extractedFeatures[aggregate].csv', index_col=0)
+					'data/aggregation[' + str(aggregation) + ']/extractedFeatures[aggregate].csv', index_col = 0)
 			extractedFeaturesScaled = pd.read_csv(
-					'data/aggregation[' + str(aggregation) + ']/extractedFeatures[aggregateScaled].csv', index_col=0)
+					'data/aggregation[' + str(aggregation) + ']/extractedFeatures[aggregateScaled].csv', index_col = 0)
 		
 		columnsOriginalFloat = []
 		columnsOriginalBoolean = []
@@ -815,13 +815,13 @@ if __name__ == '__main__':
 		
 		distanceMatrixOriginalBoolean = squareform(pdist(extractedFeaturesOriginalBoolean.values, 'hamming'))
 		with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixOriginalBoolean.csv', 'w',
-		          newline='') as file:
+		          newline = '') as file:
 			writer = csv.writer(file)
 			writer.writerows(distanceMatrixOriginalBoolean)
 		
 		distanceMatrixOriginalFloat = squareform(pdist(extractedFeaturesOriginalFloat.values, 'euclidean'))
 		with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixOriginalFloat.csv', 'w',
-		          newline='') as file:
+		          newline = '') as file:
 			writer = csv.writer(file)
 			writer.writerows(distanceMatrixOriginalFloat)
 		
@@ -840,12 +840,12 @@ if __name__ == '__main__':
 		
 		distanceMatrixScaledBoolean = squareform(pdist(extractedFeaturesScaledBoolean.values, 'hamming'))
 		with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixScaledBoolean.csv', 'w',
-		          newline='') as file:
+		          newline = '') as file:
 			writer = csv.writer(file)
 			writer.writerows(distanceMatrixScaledBoolean)
 		
 		distanceMatrixScaledFloat = squareform(pdist(extractedFeaturesScaledFloat.values, 'euclidean'))
-		with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixScaledFloat.csv', 'w', newline='') as file:
+		with open('data/aggregation[' + str(aggregation) + ']/distanceMatrixScaledFloat.csv', 'w', newline = '') as file:
 			writer = csv.writer(file)
 			writer.writerows(distanceMatrixScaledFloat)
 		
@@ -853,15 +853,15 @@ if __name__ == '__main__':
 		
 		spearmanOriginalWeightArray = [0.0]  # np.linspace(0.0, 0.25, num=3)
 		spearmanScaledWeightArray = [0.0]  # np.linspace(0.0, 0.25, num=3)
-		cidScaledWeightArray = np.linspace(0.0, 0.25, num=3)
-		freshetScaledWeightArray = np.linspace(0.0, 0.25, num=3)
+		cidScaledWeightArray = np.linspace(0.0, 0.25, num = 3)
+		freshetScaledWeightArray = np.linspace(0.0, 0.25, num = 3)
 		euclideanScaledWeightArray = [0.0]  # np.linspace(0.0, 0.375, num=3)
-		mjcScaledWeightArray = np.linspace(0.0, 0.5, num=3)
+		mjcScaledWeightArray = np.linspace(0.0, 0.5, num = 3)
 		lengthsWeightArray = [0.0]  # np.linspace(0.0, 0.5, num=3)
 		originalFloatWeightArray = [0.0]  # np.linspace(0.0, 1.0, num=3)
-		originalBooleanWeightArray = np.linspace(0.0, 0.5, num=3)
+		originalBooleanWeightArray = np.linspace(0.0, 0.5, num = 3)
 		scaledFloatWeightArray = [0.0]  # np.linspace(0.0, 0.5, num=3)
-		scaledBooleanWeightArray = np.linspace(0.0, 0.5, num=3)
+		scaledBooleanWeightArray = np.linspace(0.0, 0.5, num = 3)
 		
 		linkageArray = ['complete']  # , 'average', 'single']
 		
@@ -925,9 +925,9 @@ if __name__ == '__main__':
 	if scaling == 1:
 		dmScaled = MinMaxScaler((0, 1)).fit_transform(dmScaled)
 	
-	clusterer = AgglomerativeClustering(n_clusters=nClusters,
-	                                    affinity='precomputed',
-	                                    linkage='complete').fit(dmScaled)
+	clusterer = AgglomerativeClustering(n_clusters = nClusters,
+	                                    affinity = 'precomputed',
+	                                    linkage = 'complete').fit(dmScaled)
 	clusters = clusterer.labels_
 	
 	clusterDataFrame = pd.DataFrame()
@@ -937,11 +937,11 @@ if __name__ == '__main__':
 	
 	clusterDataFrame.to_csv('data/clusters.csv')
 	
-	mainDataConverted = mainDataConverted.sort_values(['to_member_id', 'cycle'], ascending=[True, True])
-	mainDataConverted.drop_duplicates(inplace=True)
+	mainDataConverted = mainDataConverted.sort_values(['to_member_id', 'cycle'], ascending = [True, True])
+	mainDataConverted.drop_duplicates(inplace = True)
 	
-	mainData = mainData.sort_values(['to_member_id', 'cycle'], ascending=[True, True])
-	mainData.drop_duplicates(inplace=True)
+	mainData = mainData.sort_values(['to_member_id', 'cycle'], ascending = [True, True])
+	mainData.drop_duplicates(inplace = True)
 	
 	mainData['tempCycle'] = pd.to_datetime(mainData['cycle'])
 	maxDataPeriod = max(mainData['tempCycle'])
@@ -960,7 +960,7 @@ if __name__ == '__main__':
 		tempColumnTSScaled.append(scaledValues[filter].values)
 		
 		mainDataFilter = mainData.loc[mainData['to_member_id'] == filter]
-		mainDataFilter = mainDataFilter.sort_values(['to_member_id', 'cycle'], ascending=[True, True])
+		mainDataFilter = mainDataFilter.sort_values(['to_member_id', 'cycle'], ascending = [True, True])
 		
 		tempColumnTSOld.append(mainDataFilter['aggregate'].values)
 		tempColumnDateOld.append(mainDataFilter['cycle'].values)
@@ -1002,13 +1002,13 @@ if __name__ == '__main__':
 		itemColors = [cm(1. * index / NUM_COLORS) for index in
 		              range(len(list(set(clusterDataFrameFilterConverted['name']))))]
 		
-		figure, axes = plt.subplots(nrows=2, ncols=2, figsize=(20, 10))
+		figure, axes = plt.subplots(nrows = 2, ncols = 2, figsize = (20, 10))
 		axesFlatten = axes.flatten()
 		
 		for item, timeStamps, color in zip(clusterDataFrameFilterConverted['ts'],
 		                                   clusterDataFrameFilterConverted['cycle'],
 		                                   itemColors):
-			axesFlatten[0].plot(timeStamps, item, color=color)
+			axesFlatten[0].plot(timeStamps, item, color = color)
 			
 			axesFlatten[0].set_xlabel('timestamp')
 			axesFlatten[0].set_ylabel('interpolated aggregated score (shifted to the left)')
@@ -1034,12 +1034,12 @@ if __name__ == '__main__':
 			tempArray = zip(newTimeStamps, newItem)
 			minTS = min(newTimeStamps)
 			
-			tempArray = [value for value in tempArray if value[0] >= minTS + relativedelta(months=3)]
+			tempArray = [value for value in tempArray if value[0] >= minTS + relativedelta(months = 3)]
 			
 			newTimeStampsCut = [value[0] for value in tempArray]
 			newItem = [value[1] for value in tempArray]
 			
-			axesFlatten[1].plot(newTimeStampsCut, newItem, color=color)
+			axesFlatten[1].plot(newTimeStampsCut, newItem, color = color)
 			
 			axesFlatten[1].set_xlim((min(globalTimeStamps), max(globalTimeStamps)))
 			
@@ -1050,30 +1050,30 @@ if __name__ == '__main__':
 		smoothSet = []
 		for item, color in zip(clusterDataFrameFilterConverted['tsScaled'], itemColors):
 			item = stats.zscore(item)
-			axesFlatten[2].plot(item, color=color)
+			axesFlatten[2].plot(item, color = color)
 			
 			axesFlatten[2].set_xlabel('timestamp')
 			axesFlatten[2].set_ylabel('interpolated scaled + zscore aggregated score (expanded)')
 			
 			smoothSet.append(item)
 		
-		smoothSetMean = np.mean(smoothSet, axis=0)
-		smoothSetStd = np.std(smoothSet, axis=0)
+		smoothSetMean = np.mean(smoothSet, axis = 0)
+		smoothSetStd = np.std(smoothSet, axis = 0)
 		
 		stdSet.append((np.mean(smoothSetStd), cluster))
 		
-		axesFlatten[2].plot(smoothSetMean, linewidth=3, linestyle='-', color='black')
+		axesFlatten[2].plot(smoothSetMean, linewidth = 3, linestyle = '-', color = 'black')
 		axesFlatten[2].fill_between(range(0, len(smoothSetMean)),
 		                            (smoothSetMean - 2 * smoothSetStd),
 		                            (smoothSetMean + 2 * smoothSetStd),
-		                            color='black', alpha=0.25, linestyle='-')
+		                            color = 'black', alpha = 0.25, linestyle = '-')
 		
 		for item, timeStamps, filter, color in zip(clusterDataFrameFilterConverted['tsOld'],
 		                                           clusterDataFrameFilterConverted['cycleOld'],
 		                                           clusterDataFrameFilterConverted['name'],
 		                                           itemColors):
 			timeStamps = [datetime.strptime(value, '%Y-%m-%d') for value in timeStamps]
-			axesFlatten[3].plot(timeStamps, item, label=filter, color=color)
+			axesFlatten[3].plot(timeStamps, item, label = filter, color = color)
 			
 			axesFlatten[3].set_xlim((min(globalTimeStamps), max(globalTimeStamps)))
 			
@@ -1171,7 +1171,7 @@ if __name__ == '__main__':
 		
 		handles, _ = axesFlatten[3].get_legend_handles_labels()
 		figure.legend(handles, clusterDataFrameFilterConverted['name'],
-		              loc='center left', bbox_to_anchor=(1, 0.5), ncol=4)
+		              loc = 'center left', bbox_to_anchor = (1, 0.5), ncol = 4)
 		
 		plt.tight_layout()
 		
@@ -1180,10 +1180,10 @@ if __name__ == '__main__':
 		figure.suptitle(
 				'Cluster: ' + str(cluster) + '; ' + str(
 						len(clusterDataFrameFilterConverted['name'])) + ' items; ' + str(tempWeight) + '%')
-		figure.subplots_adjust(top=0.88)
+		figure.subplots_adjust(top = 0.88)
 		
 		plt.rcParams['figure.figsize'] = 120, 36
-		figure.savefig('plots/' + str(tempWeight) + '%_cluster[' + str(cluster) + '].png', dpi=300, bbox_inches='tight')
+		figure.savefig('plots/' + str(tempWeight) + '%_cluster[' + str(cluster) + '].png', dpi = 300, bbox_inches = 'tight')
 		
 		plt.clf()
 	

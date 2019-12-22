@@ -16,12 +16,12 @@ from sklearn.preprocessing import MinMaxScaler
 
 warnings.filterwarnings('ignore')
 
-warnings.simplefilter(action='ignore', category=FutureWarning)
-warnings.simplefilter(action='ignore', category=DeprecationWarning)
+warnings.simplefilter(action = 'ignore', category = FutureWarning)
+warnings.simplefilter(action = 'ignore', category = DeprecationWarning)
 
 with warnings.catch_warnings():
-	warnings.filterwarnings('ignore', category=FutureWarning)
-	warnings.filterwarnings('ignore', category=DeprecationWarning)
+	warnings.filterwarnings('ignore', category = FutureWarning)
+	warnings.filterwarnings('ignore', category = DeprecationWarning)
 
 #
 
@@ -36,12 +36,12 @@ notIncludedColumn = []
 averageCountColumn = []
 numOfClustersColumn = []
 
-mainData = pd.read_csv('../_dataProcessing/data/PRS[agg_2].csv', index_col=0)
+mainData = pd.read_csv('../_dataProcessing/data/PRS[agg_2].csv', index_col = 0)
 
 mainData = mainData[['cycle', 'to_member_id', 'prsScaled']]
 
-firedData = pd.read_csv('../../../data/firedDataUpdated.csv', index_col=None, sep=';')
-firedData.dropna(inplace=True)
+firedData = pd.read_csv('../../../data/firedDataUpdated.csv', index_col = None, sep = ';')
+firedData.dropna(inplace = True)
 firedData = firedData.set_index('user').T.to_dict('list')
 
 tempColumn = []
@@ -146,12 +146,12 @@ for threshold in METRICBOUND:
 					for subIndex1, subItem1 in enumerate(item1):
 						
 						for subIndex2, subItem2 in enumerate(item2):
-							metric.append(dtw.distance_fast(subItem1, subItem2, psi=1))
+							metric.append(dtw.distance_fast(subItem1, subItem2, psi = 1))
 					
 					metric = max(metric)
 				
 				else:
-					metric = dtw.distance_fast(item1, item2, psi=1)
+					metric = dtw.distance_fast(item1, item2, psi = 1)
 				
 				dm[index1][index2] = metric
 				dm[index2][index1] = dm[index1][index2]
@@ -255,7 +255,7 @@ for threshold in METRICBOUND:
 	os.makedirs('output/case[' + str(threshold) + ']', 0o0755)
 	
 	#
-	mainData = pd.read_csv('../_dataProcessing/data/PRS.csv', index_col=0)
+	mainData = pd.read_csv('../_dataProcessing/data/PRS.csv', index_col = 0)
 	
 	tempColumn = []
 	for item in mainData['to_member_id']:
@@ -315,19 +315,19 @@ for threshold in METRICBOUND:
 		NUMCOLORS = len(key)
 		itemColors = [cm(1. * index / NUMCOLORS) for index in range(NUMCOLORS)]
 		
-		figure, axes = plt.subplots(nrows=2, ncols=2, figsize=(20, 10))
+		figure, axes = plt.subplots(nrows = 2, ncols = 2, figsize = (20, 10))
 		axesFlatten = axes.flatten()
 		
 		# original values
 		for subKey, color in zip(key, itemColors):
-			axesFlatten[0].plot(timeStamps.get(subKey), realScores.get(subKey), color=color)
+			axesFlatten[0].plot(timeStamps.get(subKey), realScores.get(subKey), color = color)
 		
 		axesFlatten[0].set_xlabel('original timestamps')
 		axesFlatten[0].set_ylabel('real values')
 		
 		# scaled values
 		for subKey, color in zip(key, itemColors):
-			axesFlatten[1].plot(timeStamps.get(subKey), scaledScores.get(subKey), color=color)
+			axesFlatten[1].plot(timeStamps.get(subKey), scaledScores.get(subKey), color = color)
 		
 		axesFlatten[1].set_xlabel('original timestamps')
 		axesFlatten[1].set_ylabel('scaled values')
@@ -336,8 +336,8 @@ for threshold in METRICBOUND:
 		
 		# aggregated values
 		for subKey, color in zip(key, itemColors):
-			axesFlatten[2].plot(range(len(trajectories.get(subKey))), trajectories.get(subKey), color=color,
-			                    label=subKey)
+			axesFlatten[2].plot(range(len(trajectories.get(subKey))), trajectories.get(subKey), color = color,
+			                    label = subKey)
 		
 		axesFlatten[2].set_xlabel('aggregated steps')
 		axesFlatten[2].set_ylabel('aggregated scaled values')
@@ -359,7 +359,7 @@ for threshold in METRICBOUND:
 			tempItem = [value[0] for value in tempItem]
 			
 			axesFlatten[3].plot(range(len(trajectoriesZScores.get(subKey))), tempItem,
-			                    color=color, label=subKey)
+			                    color = color, label = subKey)
 			
 			meanTrajectory.append(tempItem)
 		
@@ -367,7 +367,7 @@ for threshold in METRICBOUND:
 		axesFlatten[3].set_ylim([-0.25, 1.25])
 		
 		try:
-			meanTrajectory = np.mean(meanTrajectory, axis=0)
+			meanTrajectory = np.mean(meanTrajectory, axis = 0)
 		# continue
 		
 		except:
@@ -379,16 +379,16 @@ for threshold in METRICBOUND:
 			continue
 		
 		meanTrajectory = np.convolve(meanTrajectory, np.ones((aggregation * 2,)) / (aggregation * 2),
-		                             mode='same')
+		                             mode = 'same')
 		meanTrajectory = meanTrajectory[aggregation: len(meanTrajectory) - aggregation]
 		
 		axesFlatten[3].plot(range(0 + aggregation, len(trajectoriesZScores.get(subKey)) - aggregation),
-		                    meanTrajectory, color='red', linewidth=3, linestyle='--')
+		                    meanTrajectory, color = 'red', linewidth = 3, linestyle = '--')
 		
 		handles, _ = axesFlatten[3].get_legend_handles_labels()
 		
-		figure.legend(handles, key, loc='center left', bbox_to_anchor=(1, 0.5),
-		              ncol=int(len(key) / 25) + 1)
+		figure.legend(handles, key, loc = 'center left', bbox_to_anchor = (1, 0.5),
+		              ncol = int(len(key) / 25) + 1)
 		
 		plt.tight_layout()
 		
@@ -432,7 +432,7 @@ for threshold in METRICBOUND:
 			titleString += 'Unknown: ' + str(unknownCount)
 		
 		figure.suptitle(titleString)
-		figure.subplots_adjust(top=0.88)
+		figure.subplots_adjust(top = 0.88)
 		
 		plt.rcParams['figure.figsize'] = 120, 36
 		
@@ -446,12 +446,12 @@ for threshold in METRICBOUND:
 		if len(fileName) == 1:
 			figure.savefig('output/case[' + str(threshold) +
 			               ']/' + str(fileName[0]) + ']_cluster[' + str(tempCount) +
-			               '].png', dpi=300, bbox_inches='tight')
+			               '].png', dpi = 300, bbox_inches = 'tight')
 		
 		else:
 			figure.savefig('output/case[' + str(threshold) +
 			               ']/cluster[' + str(tempCount) +
-			               '].png', dpi=300, bbox_inches='tight')
+			               '].png', dpi = 300, bbox_inches = 'tight')
 		
 		plt.clf()
 		plt.close(figure)
@@ -490,11 +490,11 @@ for threshold in METRICBOUND:
 	clusteringResults['cluster'] = tempClusters
 	clusteringResults['clusterNumber'] = tempClusterNumber
 	
-	clusteringResults.to_csv('output/case[' + str(threshold) + ']/clusteringResults.csv', index=None)
+	clusteringResults.to_csv('output/case[' + str(threshold) + ']/clusteringResults.csv', index = None)
 
 report['metric'] = metricColumn
 report['notIncluded'] = notIncludedColumn
 report['averageCount'] = averageCountColumn
 report['numOfClusters'] = numOfClustersColumn
 
-report.to_csv('output/report.csv', index=None)
+report.to_csv('output/report.csv', index = None)

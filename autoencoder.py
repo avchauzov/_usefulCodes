@@ -14,7 +14,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 #
 
-data = pd.read_csv('../_dataProcessing/data/PRS[agg_1].csv', index_col=0)
+data = pd.read_csv('../_dataProcessing/data/PRS[agg_1].csv', index_col = 0)
 
 trajectories = []
 for filter in sorted(list(set(data['to_member_id']))):
@@ -45,34 +45,34 @@ maxLength = 50
 
 
 def createModel(_convSize, _maxPoolingSize, _activation):
-	inputWindow = Input(shape=(maxLength, 1))
+	inputWindow = Input(shape = (maxLength, 1))
 	
-	layer = Conv1D(_convSize, 2, activation='relu', padding='same')(inputWindow)
-	layer = MaxPooling1D(_maxPoolingSize, padding='same')(layer)
-	layer = Conv1D(1, 2, activation='relu', padding='same')(layer)
-	encoded = MaxPooling1D(1, padding='same')(layer)
+	layer = Conv1D(_convSize, 2, activation = 'relu', padding = 'same')(inputWindow)
+	layer = MaxPooling1D(_maxPoolingSize, padding = 'same')(layer)
+	layer = Conv1D(1, 2, activation = 'relu', padding = 'same')(layer)
+	encoded = MaxPooling1D(1, padding = 'same')(layer)
 	
 	encoder = Model(inputWindow, encoded)
 	
-	layer = Conv1D(1, 2, activation='relu', padding='same')(encoded)
+	layer = Conv1D(1, 2, activation = 'relu', padding = 'same')(encoded)
 	layer = UpSampling1D(1)(layer)
-	layer = Conv1D(_convSize, 1, activation='relu')(layer)
+	layer = Conv1D(_convSize, 1, activation = 'relu')(layer)
 	layer = UpSampling1D(_maxPoolingSize)(layer)
-	decoded = Conv1D(1, 2, activation=_activation, padding='same')(layer)
+	decoded = Conv1D(1, 2, activation = _activation, padding = 'same')(layer)
 	
 	autoencoder = Model(inputWindow, decoded)
 	autoencoder.summary()
 	
-	autoencoder.compile(optimizer='adam', loss='mean_squared_error',
-	                    metrics=['mean_squared_error', 'mean_absolute_error'])
+	autoencoder.compile(optimizer = 'adam', loss = 'mean_squared_error',
+	                    metrics = ['mean_squared_error', 'mean_absolute_error'])
 	
 	return encoder, autoencoder, encoded
 
 
-earlyStopping = EarlyStopping(monitor='val_loss',
-                              min_delta=0.0,
-                              patience=25,
-                              verbose=0, mode='auto')
+earlyStopping = EarlyStopping(monitor = 'val_loss',
+                              min_delta = 0.0,
+                              patience = 25,
+                              verbose = 0, mode = 'auto')
 
 modelResults = {}
 for convSize in [1, 2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]:
@@ -100,9 +100,9 @@ for convSize in [1, 2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]:
 				continue
 			
 			history = autoencoder.fit(xTrain, xTrain,
-			                          epochs=1,
-			                          batch_size=1024,
-			                          verbose=0)
+			                          epochs = 1,
+			                          batch_size = 1024,
+			                          verbose = 0)
 		
 		except:
 			print(convSize, maxPoolingSize, activation)
@@ -133,11 +133,11 @@ for convSize in [1, 2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]:
 				encoder, autoencoder, encoded = createModel(convSize, maxPoolingSize, activation)
 				
 				history = autoencoder.fit(xTrain, xTrain,
-				                          epochs=1000,
-				                          batch_size=1024,
-				                          shuffle=True,
-				                          validation_data=[xTest, xTest],
-				                          callbacks=[earlyStopping])
+				                          epochs = 1000,
+				                          batch_size = 1024,
+				                          shuffle = True,
+				                          validation_data = [xTest, xTest],
+				                          callbacks = [earlyStopping])
 				
 				if '; '.join([str(convSize), str(maxPoolingSize), str(activation)]) not in modelResults.keys():
 					modelResults['; '.join([str(convSize), str(maxPoolingSize), str(activation)])] = [[encoded.shape.dims[1].value,
@@ -161,7 +161,7 @@ for convSize in [1, 2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]:
 			
 			modelResultsUpdated = {}
 			for key, value in modelResults.items():
-				modelResultsUpdated[key] = list(np.mean(np.array(value), axis=0))
+				modelResultsUpdated[key] = list(np.mean(np.array(value), axis = 0))
 			
-			modelResultsUpdated = pd.DataFrame.from_dict(modelResultsUpdated, orient='index', columns=['shape', 'loss', 'val_loss', 'mse', 'val_mse', 'mae', 'val_mae', 'iterations'])
+			modelResultsUpdated = pd.DataFrame.from_dict(modelResultsUpdated, orient = 'index', columns = ['shape', 'loss', 'val_loss', 'mse', 'val_mse', 'mae', 'val_mae', 'iterations'])
 			modelResultsUpdated.to_csv('data/1.0.0.modelResults.csv')

@@ -66,7 +66,7 @@ class getCommons:
 						'for token in token2token ' + \
 						'filter token._from == "' + str(id) + '" ' + \
 						'return [token._to, token.similarity]'
-				)
+						)
 				
 				tempCursor = [(value[0], value[1]) for value in tempCursor]
 				

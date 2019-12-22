@@ -24,17 +24,17 @@ import functools
 import itertools
 
 
-def setUpLogging(logFile=None, level=logging.INFO, source=__name__):
+def setUpLogging(logFile = None, level = logging.INFO, source = __name__):
 	open(logFile, 'w').close()
 	
 	logger = logging.getLogger(source)
 	logger.setLevel(level)
 	
 	handler = logging.handlers.RotatingFileHandler(
-			filename=logFile,
-			maxBytes=10485760,
-			backupCount=10,
-			encoding='utf8')
+			filename = logFile,
+			maxBytes = 10485760,
+			backupCount = 10,
+			encoding = 'utf8')
 	
 	logger.addHandler(handler)
 	
@@ -99,7 +99,7 @@ if __name__ == '__main__':
 			
 			continue
 		
-		settings = pd.DataFrame(settings.get_all_records(head=0))
+		settings = pd.DataFrame(settings.get_all_records(head = 0))
 		settings.columns = ['value', 'name']
 		
 		oemLevel = float(settings['value'][0])
@@ -135,18 +135,18 @@ if __name__ == '__main__':
 			               tempStoredData['number']]
 			
 			if shopName == 'shopName':  # replace
-				api = Trading(debug=False, config_file=None,
-				              appid='appid',  # replace
-				              certid='certid',  # replace
-				              devid='devid',  # replace
-				              token='token')  # replace
+				api = Trading(debug = False, config_file = None,
+				              appid = 'appid',  # replace
+				              certid = 'certid',  # replace
+				              devid = 'devid',  # replace
+				              token = 'token')  # replace
 			
 			else:
-				api = Trading(debug=False, config_file=None,
-				              appid='appid',
-				              certid='certid',
-				              devid='devid',
-				              token='token')
+				api = Trading(debug = False, config_file = None,
+				              appid = 'appid',
+				              certid = 'certid',
+				              devid = 'devid',
+				              token = 'token')
 			
 			for id, buyPrice, shippingPrice, \
 			    title, oem, condition, yearStart, yearEnd, \
@@ -232,7 +232,7 @@ if __name__ == '__main__':
 									tempPValue = np.random.geometric(0.5, len(number[1:]))
 									tempPValue = tempPValue / sum(tempPValue)
 									
-									numberValue = np.random.choice(number[1:], p=tempPValue)
+									numberValue = np.random.choice(number[1:], p = tempPValue)
 									
 									if random.uniform(0.0, 1.0) >= numberType2:
 										tempValue.append(''.join(numberValue.split()))
@@ -351,7 +351,7 @@ if __name__ == '__main__':
 							'ItemID'                      : id, 'DetailLevel': 'ReturnAll',
 							'IncludeItemCompatibilityList': True,
 							'IncludeItemSpecifics'        : True
-					})
+							})
 				
 				except:
 					continue
@@ -625,15 +625,15 @@ if __name__ == '__main__':
 											'GalleryURL' : pictureList[0],
 											'PictureURL' : pictureList,
 											'GalleryType': 'Gallery'
-									},
+											},
 									'Title'           : newTitle,
 									'BestOfferDetails': {
 											'BestOfferEnabled': True
-									},
+											},
 									# 'Description'          : descriptionText,
 									# 'DescriptionReviseMode': 'Replace'
-							}
-					})
+									}
+							})
 				
 				except ConnectionError as e:
 					print('[mainAlgo] ', e)

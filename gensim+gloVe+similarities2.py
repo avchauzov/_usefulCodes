@@ -31,11 +31,11 @@ class similarityProcess:
 	
 	def __init__(self):
 		# self.model = Word2Vec.load(GENSIM_MODEL)
-		self.model = KeyedVectors.load_word2vec_format(GENSIM_MODEL, binary=False)
+		self.model = KeyedVectors.load_word2vec_format(GENSIM_MODEL, binary = False)
 		self.gloveModel = KeyedVectors.load(GLOVE_MODEL)
-		self.wordLemmas = pd.read_csv(INPUT_FILE, index_col=0)
+		self.wordLemmas = pd.read_csv(INPUT_FILE, index_col = 0)
 		
-		self.data = pd.read_csv(FILE_TO_UPDATE, index_col=0)
+		self.data = pd.read_csv(FILE_TO_UPDATE, index_col = 0)
 	
 	def run(self):
 		keysToUse = self.getPopularTokens(self.data)
@@ -107,7 +107,7 @@ class similarityProcess:
 	
 	@classmethod
 	def exportFile(cls, tempArray):
-		tempArray.sort(key=lambda tup: tup[2], reverse=True)
+		tempArray.sort(key = lambda tup: tup[2], reverse = True)
 		
 		result = pd.DataFrame()
 		result['originalToken'] = [value[0] for value in tempArray]

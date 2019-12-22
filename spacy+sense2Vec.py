@@ -26,7 +26,7 @@ class textPreprocessing:
 		pass
 	
 	def run(self):
-		data = pd.read_csv(DATASET_DIRECTORY, index_col=0)
+		data = pd.read_csv(DATASET_DIRECTORY, index_col = 0)
 		
 		bagOfWords = []
 		for index, text in enumerate(data['text']):
@@ -316,7 +316,7 @@ class textPreprocessing:
 		value = nlp(item)
 		
 		for ent in value.ents:
-			ent.merge(tag=ent.root.tag_, lemma=ent.text, label=ent.label_)
+			ent.merge(tag = ent.root.tag_, lemma = ent.text, label = ent.label_)
 		
 		wordReturn = cls.returnWord(value)
 		lemmaReturn = cls.returnLemma(value)
@@ -394,14 +394,14 @@ class textPreprocessing:
 				np = np[1:]
 			
 			if not any(item in np.text for item in ['DATE', 'PERCENT', 'NUMBER', 'QUOTE']):
-				np.merge(tag=np.root.tag_, lemma=np.text, label=np.root.ent_type_)
+				np.merge(tag = np.root.tag_, lemma = np.text, label = np.root.ent_type_)
 		
 		return cls.returnWord(value)
 	
 	@classmethod
 	def writeText(cls, index, tag, array):
 		
-		with io.open(OUTPUT_DIRECTORY + '//' + str(index) + tag, 'w', encoding='utf8') as fileOpen:
+		with io.open(OUTPUT_DIRECTORY + '//' + str(index) + tag, 'w', encoding = 'utf8') as fileOpen:
 			for item in array:
 				fileOpen.write(item + '\n')
 	

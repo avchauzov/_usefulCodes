@@ -20,7 +20,7 @@ except ImportError:
 	import json
 
 LOGGER = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+logging.basicConfig(format = '%(asctime)s : %(levelname)s : %(message)s', level = logging.INFO)
 
 DATASET_DIRECTORY = 'outputData//preprocessedTexts'
 OUTPUT_NAME = 'outputData//model.txt'
@@ -29,7 +29,7 @@ OUTPUT_MODEL = 'outputData//model'
 
 class Corpus(object):
 	
-	def __init__(self, directory, min_freq=10):
+	def __init__(self, directory, min_freq = 10):
 		self.directory = directory
 		self.counts = PreshCounter()
 		self.strings = {}
@@ -60,7 +60,7 @@ class Corpus(object):
 		
 		for text_loc in trainModel.iterDir(self.directory):
 			
-			with io.open(text_loc, 'r', encoding='utf8') as file_:
+			with io.open(text_loc, 'r', encoding = 'utf8') as file_:
 				
 				sent_strs = list(file_)
 				random.shuffle(sent_strs)
@@ -74,12 +74,12 @@ class trainModel:
 	def __init__(self):
 		self.corpus = Corpus(DATASET_DIRECTORY)
 		
-		self.model = Word2Vec(size=100,
-		                      window=5,
-		                      min_count=10,
-		                      workers=1,
-		                      sample=1e-3,
-		                      negative=10
+		self.model = Word2Vec(size = 100,
+		                      window = 5,
+		                      min_count = 10,
+		                      workers = 1,
+		                      sample = 1e-3,
+		                      negative = 10
 		                      )
 	
 	def run(self):
@@ -87,7 +87,7 @@ class trainModel:
 		totalSents = 0
 		
 		for textNum, textLoc in enumerate(self.iterDir(self.corpus.directory)):
-			with io.open(textLoc, 'r', encoding='utf8') as fileOpen:
+			with io.open(textLoc, 'r', encoding = 'utf8') as fileOpen:
 				text = fileOpen.read()
 			
 			totalSents += text.count('\n')
@@ -100,7 +100,7 @@ class trainModel:
 		self.model.iter = 10
 		self.model.build_vocab(self.corpus)
 		
-		self.model.train(self.corpus, total_examples=self.model.corpus_count, epochs=self.model.iter)
+		self.model.train(self.corpus, total_examples = self.model.corpus_count, epochs = self.model.iter)
 		
 		self.saveModel(self.model)
 	
@@ -120,7 +120,7 @@ class trainModel:
 	@classmethod
 	def saveModel(cls, model):
 		model.save(OUTPUT_MODEL)
-		model.wv.save_word2vec_format(OUTPUT_NAME, binary=False)
+		model.wv.save_word2vec_format(OUTPUT_NAME, binary = False)
 
 
 tm = trainModel()

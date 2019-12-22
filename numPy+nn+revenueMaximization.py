@@ -35,9 +35,9 @@ def forwardPropagation(model, xSet, xSetAdditional):
 	for index in range(len(xSet)):
 		z1.append(getTransportCosts(xSetAdditional[index][0], W1[index], b1[index]) * xSetAdditional[index][1] + \
 		          getTransportCosts(xSetAdditional[index][2], W1[index], b1[index]) + xSet[index])
-	z1 = np.array(z1, dtype=np.float)
+	z1 = np.array(z1, dtype = np.float)
 	
-	a1 = np.array([[np.sum(z1)]], dtype=np.float).reshape((1, 1))
+	a1 = np.array([[np.sum(z1)]], dtype = np.float).reshape((1, 1))
 	
 	return {'a0': xSet, 'z1': z1, 'a1': a1}
 
@@ -48,7 +48,7 @@ def forwardPropagationFull(model, xSet, xSetAdditional, W, b):
 	for index in range(len(xSet)):
 		z1.append(getTransportCosts(xSetAdditional[index][0], W[index], b[index]) * xSetAdditional[index][1] + \
 		          getTransportCosts(xSetAdditional[index][2], W[index], b[index]) + xSet[index])
-	z1 = np.array(z1, dtype=np.float)
+	z1 = np.array(z1, dtype = np.float)
 	
 	return z1
 
@@ -62,10 +62,10 @@ def backwardPropagation(model, cache, yTarget):
 	a0, a1 = cache['a0'], cache['a1']
 	
 	m = yTarget.shape[0]
-	dz1 = lossDerivative(yTarget=yTarget, yPredicted=a1)
+	dz1 = lossDerivative(yTarget = yTarget, yPredicted = a1)
 	
 	dW1 = 1 / m * np.dot(dz1[0][0], a0.T)
-	db1 = 1 / m * np.sum(dz1, axis=0)
+	db1 = 1 / m * np.sum(dz1, axis = 0)
 	# db1 = np.array([[0.0]], dtype=np.float).reshape((1, 1))
 	
 	return {'dW1': dW1, 'db1': db1}
@@ -132,7 +132,7 @@ globalPredictionsByEachRoute = []
 globalPredictionsByEachRouteLast = []
 
 
-def trainModel(model, xSet, ySet, learningRate, epochs=1000):
+def trainModel(model, xSet, ySet, learningRate, epochs = 1000):
 	learningRateBase = deepcopy(learningRate)
 	
 	losses = []
@@ -155,7 +155,7 @@ def trainModel(model, xSet, ySet, learningRate, epochs=1000):
 		if len(losses) > 0:
 			
 			for _ in range(7):
-				tempModel = updateParameters(model=model, gradients=gradients, learningRate=learningRate)
+				tempModel = updateParameters(model = model, gradients = gradients, learningRate = learningRate)
 				yHat = predict(tempModel, xSet)['a1']
 				tempLoss = ((ySet - a1) ** 2)[0][0]
 				
@@ -166,11 +166,12 @@ def trainModel(model, xSet, ySet, learningRate, epochs=1000):
 					break
 		#
 		
-		model = updateParameters(model=model, gradients=gradients, learningRate=learningRate)
+		model = updateParameters(model = model, gradients = gradients, learningRate = learningRate)
 		
 		yHat = predict(model, xSet)['a1']
 		
-		print 'Loss [' + str(i) + ']: ' + str(((ySet - a1) ** 2)[0][0]), 'MAE: ' + str(np.abs(yHat - ySet)[0][0])
+		print
+		'Loss [' + str(i) + ']: ' + str(((ySet - a1) ** 2)[0][0]), 'MAE: ' + str(np.abs(yHat - ySet)[0][0])
 		
 		losses.append(((ySet - a1) ** 2)[0][0])
 		metric.append(np.absolute(ySet - a1)[0][0])
@@ -221,11 +222,11 @@ def trainModel(model, xSet, ySet, learningRate, epochs=1000):
 
 #
 
-predictions = pd.read_csv('1.1.predictionsUpdated.csv', index_col=0)
+predictions = pd.read_csv('1.1.predictionsUpdated.csv', index_col = 0)
 predictions['routeID'] = [int(float(value)) for value in predictions['routeID']]
 
-pricesData = pd.read_csv('1.5.prices.csv', index_col=0)
-weightsData = pd.read_csv('1.5.weights.csv', index_col=0)
+pricesData = pd.read_csv('1.5.prices.csv', index_col = 0)
+weightsData = pd.read_csv('1.5.weights.csv', index_col = 0)
 
 pricesData['shipping_date'] = weightsData['shipping_date']
 pricesData = pricesData[['shipping_date', 'routeID', 'pricePerKilo']]
@@ -246,10 +247,10 @@ for routeID in sorted(list(set(pricesData['routeID'].values))):
 # print(sorted(list(set(dictionaryPrices.keys()))))
 
 predictions = predictions.loc[predictions['routeID'].isin(dictionaryPrices.keys())]
-predictions.sort_values('routeID', inplace=True)
+predictions.sort_values('routeID', inplace = True)
 
 dictionaryPrices = [(key, value) for key, value in dictionaryPrices.items()]
-dictionaryPrices = sorted(dictionaryPrices, key=lambda tup: tup[0])
+dictionaryPrices = sorted(dictionaryPrices, key = lambda tup: tup[0])
 
 # print(len(predictions['routeID'].values))
 # print(len(dictionaryPrices))
@@ -260,17 +261,17 @@ dictionaryPrices = sorted(dictionaryPrices, key=lambda tup: tup[0])
 xTrain = []
 for index in range(len(predictions['nanmean'].values)):
 	xTrain.append((predictions['nanmean'].values[index] * predictions['amount'].values[index] + predictions['rest'].values[index]) * dictionaryPrices[index][1])
-xTrain = np.array(xTrain, dtype=np.float)
+xTrain = np.array(xTrain, dtype = np.float)
 
 W1 = []
 for index in range(len(dictionaryPrices)):
 	W1.append(-0.67921 * uniform(0.5, 1.5))
-W1 = np.array(W1, dtype=np.float)
+W1 = np.array(W1, dtype = np.float)
 
 b1 = []
 for index in range(len(dictionaryPrices)):
 	b1.append(-20.37 * uniform(0.5, 1.5))
-b1 = np.array(b1, dtype=np.float)
+b1 = np.array(b1, dtype = np.float)
 
 upperBoundCoefficient = 1.25
 lowerBoundCoefficient = 0.75
@@ -284,11 +285,11 @@ averagePriceLowerBoundb1 = np.round(b1.dot(lowerBoundCoefficient), 2)
 xTrainAdditional = []
 for index in range(len(predictions['nanmean'].values)):
 	xTrainAdditional.append((predictions['nanmean'].values[index], predictions['amount'].values[index], predictions['rest'].values[index]))
-xTrainAdditional = np.array(xTrainAdditional, dtype=np.float)
+xTrainAdditional = np.array(xTrainAdditional, dtype = np.float)
 
 routeNames = [value[0] for value in dictionaryPrices]
 
-model = initializeParameters(weights=[W1, b1], volumes=xTrain)
+model = initializeParameters(weights = [W1, b1], volumes = xTrain)
 ySet = forwardPropagation(model, xTrain, xTrainAdditional)
 
 basicModel = deepcopy(model)
@@ -297,10 +298,11 @@ if ySet['a1'] > 0:
 	targetValue = ySet['a1']
 
 else:
-	targetValue = np.array([[np.sum(xTrain)]], dtype=np.float).reshape((1, 1))
+	targetValue = np.array([[np.sum(xTrain)]], dtype = np.float).reshape((1, 1))
 
 for mainIteration in range(1000):
-	print 'mainIteration: ', mainIteration
+	print
+	'mainIteration: ', mainIteration
 	
 	if mainIteration == 0:
 		pass
@@ -312,18 +314,20 @@ for mainIteration in range(1000):
 	
 	W1Old = deepcopy(model['W1'])
 	
-	model, losses = trainModel(model, xTrain, targetValue, learningRate=learningRate, epochs=100)
+	model, losses = trainModel(model, xTrain, targetValue, learningRate = learningRate, epochs = 100)
 	
 	if len(losses) > 0:
 		
 		if str(losses[-1]) == 'nan':
-			print '***Stop because of nan!'
+			print
+			'***Stop because of nan!'
 			break
 	
 	if len(globalLossesLast) > 1:
 		
 		if globalLossesLast[-1] > globalLossesLast[-2]:
-			print '***Stop because of loss increasing!'
+			print
+			'***Stop because of loss increasing!'
 			model['W1'] = W1Old
 			break
 
@@ -332,16 +336,21 @@ for mainIteration in range(1000):
 minIndexLastLoss = globalLossesLast.index(min(value for value in globalLossesLast if value > 0))
 minIndexLoss = globalLosses[minIndexLastLoss].index(min(value for value in globalLosses[minIndexLastLoss] if value > 0))
 
-print 'minLoss: ', round(globalLosses[minIndexLastLoss][minIndexLoss], 2)
+print
+'minLoss: ', round(globalLosses[minIndexLastLoss][minIndexLoss], 2)
 
-print 'optimalPricesUnder30: ', np.round(globalPricesUnder30[minIndexLastLoss][minIndexLoss], 5)
-print 'optimalPricesOver30: ', np.round(globalPricesOver30[minIndexLastLoss][minIndexLoss], 5)
+print
+'optimalPricesUnder30: ', np.round(globalPricesUnder30[minIndexLastLoss][minIndexLoss], 5)
+print
+'optimalPricesOver30: ', np.round(globalPricesOver30[minIndexLastLoss][minIndexLoss], 5)
 
 model['b1'] = globalPricesUnder30[minIndexLastLoss][minIndexLoss]
 model['W1'] = globalPricesOver30[minIndexLastLoss][minIndexLoss]
 
-print 'basicRevenue: ', round(forwardPropagation(basicModel, xTrain, xTrainAdditional)['a1'][0][0], 2)
-print 'expectedRevenue: ', round(forwardPropagation(model, xTrain, xTrainAdditional)['a1'][0][0], 2)
+print
+'basicRevenue: ', round(forwardPropagation(basicModel, xTrain, xTrainAdditional)['a1'][0][0], 2)
+print
+'expectedRevenue: ', round(forwardPropagation(model, xTrain, xTrainAdditional)['a1'][0][0], 2)
 
 globalLosses = globalLosses[1: minIndexLastLoss + 1]
 globalLossesLast = globalLossesLast[1: minIndexLastLoss + 1]
@@ -448,7 +457,7 @@ for index in range(len(globalPredictionsByEachRoute[0])):
 	tempArrayY = [float(value[index]) for value in globalPredictionsByEachRoute]
 	
 	points = [(value1, value2) for value1, value2 in zip(tempArrayX, tempArrayY)]
-	points = sorted(points, key=lambda tup: tup[0])
+	points = sorted(points, key = lambda tup: tup[0])
 	
 	if tempArrayY[-1] < tempArrayY[0]:
 		tempIndices.append(index)
